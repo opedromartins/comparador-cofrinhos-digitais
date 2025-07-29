@@ -40,7 +40,12 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block font-medium mb-2">Selecione as opções para comparar:</label>
+                    <label class="block font-medium mb-4">Filtros rápidos:</label>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button type="button" id="toggle-all-btn" class="text-sm font-medium text-[#4E8D7C] border border-[#4E8D7C] hover:bg-[#4E8D7C] hover:text-white transition px-4 py-1 rounded-full">Selecionar Todos/Limpar</button>
+                        <button type="button" id="select-standard-btn" class="text-sm font-medium text-[#4E8D7C] border border-[#4E8D7C] hover:bg-[#4E8D7C] hover:text-white transition px-4 py-1 rounded-full">Caixinhas padrão (não promocionais)</button>
+                        <button type="button" id="select-fgc-btn" class="text-sm font-medium text-[#4E8D7C] border border-[#4E8D7C] hover:bg-[#4E8D7C] hover:text-white transition px-4 py-1 rounded-full">Com FGC</button>
+                    </div>
                     <div id="caixinhas-list" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
                 </div>
 

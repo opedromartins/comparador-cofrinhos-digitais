@@ -97,7 +97,7 @@ const bankData = [
         prazoMaximo: 0,
         extra: 'Para metas de médio/longo prazo devido à isenção fiscal.',
         recommendations: { emergency: false, short_term: false, maximize: true },
-        type: 'standard'
+        type: 'promo'
     },
     {
         id: 'picpay_padrao',

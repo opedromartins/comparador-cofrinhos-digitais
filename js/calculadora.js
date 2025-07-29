@@ -142,6 +142,42 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     caixinhasList.appendChild(customCaixinhaTriggerLabel);
 
+    const toggleAllBtn = document.getElementById('toggle-all-btn');
+    const selectStandardBtn = document.getElementById('select-standard-btn');
+    const selectFgcBtn = document.getElementById('select-fgc-btn');
+
+    const getAllCheckboxes = () => document.querySelectorAll('.caixinha-checkbox:not(#custom-caixinha-trigger)');
+
+    const setAllCheckboxes = (checked) => {
+        getAllCheckboxes().forEach(cb => cb.checked = checked);
+    };
+
+    toggleAllBtn.addEventListener('click', () => {
+        const currentlyChecked = document.querySelectorAll('.caixinha-checkbox:not(#custom-caixinha-trigger):checked');
+        const shouldSelectAll = currentlyChecked.length < getAllCheckboxes().length;
+        setAllCheckboxes(shouldSelectAll);
+    });
+
+    selectStandardBtn.addEventListener('click', () => {
+        setAllCheckboxes(false);
+        const standardIds = bankData.filter(b => b.type === 'standard').map(b => b.id);
+        getAllCheckboxes().forEach(cb => {
+            if (standardIds.includes(cb.value)) {
+                cb.checked = true;
+            }
+        });
+    });
+
+    selectFgcBtn.addEventListener('click', () => {
+        setAllCheckboxes(false);
+        const fgcIds = bankData.filter(b => b.fgc).map(b => b.id);
+        getAllCheckboxes().forEach(cb => {
+            if (fgcIds.includes(cb.value)) {
+                cb.checked = true;
+            }
+        });
+    });
+
     document.getElementById('custom-caixinha-trigger').addEventListener('change', function(e) {
         if (e.target.checked) {
             customCaixinhaWrapper.classList.remove('hidden');
