@@ -1,3 +1,22 @@
+async function getCDIAnual() {
+    try {
+        const url = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/1?formato=json';
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            const selicAnual = parseFloat(data[0].valor);
+            return selicAnual / 100;
+        } else {
+            throw new Error('Não foi possível obter os dados da Selic Meta.');
+        }
+    } catch (error) {
+        console.error("Erro ao buscar Selic Meta:", error);
+        alert('Não foi possível buscar a taxa Selic atualizada. Usando uma taxa padrão de 14,90% a.a. para o cálculo.');
+        return 0.149;
+    }
+}
+
 function getBusinessDays(calendarDays) {
     let businessDays = 0;
     const today = new Date();
@@ -141,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('calc-form').addEventListener('submit', function(e) {
+    document.getElementById('calc-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const valor = parseFloat(document.getElementById('valor-aporte').value);
@@ -176,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeBankData.push(customBank);
         }
 
-        const CDI_ano = 0.15;
+        const CDI_ano = await getCDIAnual();
         const CDI_dia = Math.pow(1 + CDI_ano, 1 / 252) - 1;
         const diasUteis = getBusinessDays(dias);
         let results = [];

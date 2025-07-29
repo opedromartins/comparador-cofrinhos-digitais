@@ -1,3 +1,18 @@
+async function getSelicMetaRate() {
+    try {
+        const url = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.1178/dados/ultimos/1?formato=json';
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.length > 0) {
+            return parseFloat(data[0].valor).toFixed(2).replace('.', ',');
+        }
+        return null;
+    } catch (error) {
+        console.error("Erro ao buscar a taxa Selic:", error);
+        return null;
+    }
+}
+
 const glossaryData = [
     {
         term: 'FGC (Fundo Garantidor de Crédito)',
@@ -5,7 +20,7 @@ const glossaryData = [
     },
     {
         term: 'CDI (Certificado de Depósito Interbancário)',
-        definition: 'É a taxa de juros que os bancos usam para emprestar dinheiro entre si. A maioria dos investimentos de renda fixa usa o CDI como referência de rentabilidade. Quando um cofrinho rende "100% do CDI", significa que seu retorno será muito próximo à taxa Selic, a taxa básica de juros da economia (atualmente em 15%).'
+        definition: 'É a taxa de juros que os bancos usam para emprestar dinheiro entre si. A maioria dos investimentos de renda fixa usa o CDI como referência de rentabilidade. Quando um cofrinho rende "100% do CDI", significa que seu retorno será muito próximo à taxa Selic, a taxa básica de juros da economia.'
     },
     {
         term: 'Liquidez',
@@ -40,7 +55,7 @@ const recommendationTexts = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const bankCardsContainer = document.getElementById('bank-cards-container');
     const goalFilters = document.getElementById('goal-filters');
     const fgcToggle = document.getElementById('fgc-toggle');
@@ -49,6 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const recommendationSection = document.getElementById('recommendation-section');
     const recommendationTextElem = document.getElementById('recommendation-text');
     const accordionContainer = document.getElementById('accordion-container');
+
+    const selicRate = await getSelicMetaRate();
+    if (selicRate) {
+        const cdiDefinitionItem = glossaryData.find(item => item.term.startsWith('CDI'));
+        if (cdiDefinitionItem) {
+            // Adiciona a frase com o valor atualizado ao final da definição
+            cdiDefinitionItem.definition += ` Atualmente o CDI anual está em torno de ${selicRate}%.`;
+        }
+    }
 
     let currentFilters = {
         goal: 'all',
