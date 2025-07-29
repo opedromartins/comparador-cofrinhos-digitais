@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador Interativo de Cofrinhos Digitais 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="antialiased">
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#4E8D7C] mb-4">Guia Interativo dos Cofrinhos Digitais 2025</h1>
+            <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                Chega de dúvidas. Descubra qual a melhor opção para guardar seu dinheiro de acordo com <span class="font-semibold text-[#D4A373]">seus objetivos</span>. Compare, filtre e decida com confiança.
+            </p>
+            <div class="mt-4">
+                <a href="calculadora" class="inline-block bg-[#4E8D7C] text-white font-semibold px-5 py-2 rounded-full shadow hover:bg-[#3B6B5E] transition">
+                    Ir para Calculadora de Rentabilidade
+                </a>
+            </div>
+        </header>
+
+        <section id="interactive-filter" class="bg-white p-6 md:p-8 rounded-2xl shadow-lg mb-12 border border-gray-100">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold mb-2">1. Qual é o seu principal objetivo?</h2>
+                <p class="text-gray-600 mb-4">Sua escolha aqui irá destacar as melhores opções para você.</p>
+                <div id="goal-filters" class="flex flex-wrap gap-3">
+                    <button data-goal="all" class="filter-btn active text-sm md:text-base font-medium py-2 px-4 rounded-full bg-gray-200 text-gray-700">Mostrar Todos</button>
+                    <button data-goal="emergency" class="filter-btn text-sm md:text-base font-medium py-2 px-4 rounded-full bg-gray-200 text-gray-700">🏦 Reserva de Emergência</button>
+                    <button data-goal="short_term" class="filter-btn text-sm md:text-base font-medium py-2 px-4 rounded-full bg-gray-200 text-gray-700">✈️ Meta de Curto Prazo</button>
+                    <button data-goal="maximize" class="filter-btn text-sm md:text-base font-medium py-2 px-4 rounded-full bg-gray-200 text-gray-700">🚀 Maximizar Rendimento</button>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-2xl font-semibold mb-2">2. Quais características são essenciais?</h2>
+                <p class="text-gray-600 mb-4">Refine sua busca com base nos seus requisitos de segurança e acesso.</p>
+                <div class="flex flex-wrap items-center gap-6">
+                    <div class="flex items-center gap-3">
+                        <label for="fgc-toggle" class="font-medium text-gray-700">Exigir garantia do FGC</label>
+                        <label class="switch">
+                            <input type="checkbox" id="fgc-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label for="liquidity-toggle" class="font-medium text-gray-700">Apenas com liquidez imediata (24/7)</label>
+                        <label class="switch">
+                            <input type="checkbox" id="liquidity-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="recommendation-section" class="mb-6 bg-teal-50 border-l-4 border-[#4E8D7C] p-6 rounded-lg hidden">
+             <h3 class="text-2xl font-bold text-[#4E8D7C] mb-2">Recomendação para seu Objetivo</h3>
+             <div id="recommendation-text" class="text-gray-700 space-y-2"></div>
+        </section>
+
+        <section id="comparison-view">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">Comparativo de Cofrinhos</h2>
+                <div id="results-count" class="text-lg font-medium text-gray-600"></div>
+            </div>
+            <div id="bank-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+        
+
+        <section id="charts-section" class="mt-16">
+            <h2 class="text-3xl font-bold text-center mb-10">Análise de Rentabilidade (% do CDI)</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-center mb-4">Opções Padrão</h3>
+                    <div class="chart-container">
+                        <canvas id="standardRentabilityChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    <h3 class="text-xl font-semibold text-center mb-4">Opções Promocionais / "Turbo"</h3>
+                     <div class="chart-container">
+                        <canvas id="turboRentabilityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="glossary-section" class="mt-16 max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-10">Dicionário</h2>
+            <div id="accordion-container" class="space-y-3">
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-[#D4A373] mb-2">Apoie este Projeto</h3>
+                <p class="text-gray-300 text-sm max-w-md mx-auto">Se esta ferramenta foi útil para você, considere fazer uma doação em Bitcoin para ajudar a manter e melhorar o site.</p>
+                <div class="flex justify-center my-4">
+                    <img src="https://quickchart.io/qr?text=bc1quw6yw5mw982pxlsmj0u7vs6yjrmkylalmje58n&size=180&centerImageUrl=https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png&centerImageSizeRatio=0.2" alt="Bitcoin Donation QR Code">
+                </div>
+                <p class="text-xs text-gray-400 font-mono break-all px-4">bc1quw6yw5mw982pxlsmj0u7vs6yjrmkylalmje58n</p>
+            </div>
+            <div class="border-t border-gray-700 pt-6">
+                <h4 class="font-semibold text-gray-400 mb-2">Disclaimer</h4>
+                <p class="text-xs text-gray-500 max-w-2xl mx-auto">
+                    As informações apresentadas neste site são apenas para fins educacionais e de comparação, compiladas a partir de dados públicos na internet. As condições e taxas de rentabilidade podem mudar a qualquer momento e sem aviso prévio. Este site não oferece consultoria financeira e não garante a precisão ou atualidade das informações. Sempre verifique as condições diretamente com a instituição financeira antes de tomar qualquer decisão de investimento.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/bankData.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Rentabilidade dos Cofrinhos Digitais</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/bankData.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/calculadora.css">
+</head>
+<body class="antialiased">
+    <div id="dynamic-tooltip" class="hidden absolute z-50 px-3 py-2 text-sm font-normal text-white bg-gray-800 rounded-lg shadow-sm"></div>
+    <div id="custom-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 hidden opacity-0">
+        <div class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-md p-6 text-center transform scale-95 opacity-0">
+            <p id="modal-message" class="text-lg text-gray-700 mb-6"></p>
+            <button id="modal-close-btn" class="bg-[#4E8D7C] text-white font-semibold px-6 py-2 rounded-full shadow-md hover:bg-[#3B6B5E] transition-all duration-200">
+                Entendi
+            </button>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#4E8D7C] mb-2">Calculadora de Rentabilidade</h1>
+            <p class="text-gray-600 mb-2">Compare o rendimento líquido das caixinhas digitais já considerando IOF e IR.</p>
+            <a href="/" class="text-[#4E8D7C] font-semibold hover:underline">← Voltar ao Guia Interativo</a>
+        </header>
+
+        <section class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 mb-8">
+            <form id="calc-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block font-medium mb-1" for="valor-aporte">Valor do Aporte Inicial (R$)</label>
+                        <input type="number" id="valor-aporte" min="1" step="1" value="1000" class="w-full py-2 input-line" required>
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1" for="prazo-dias">Prazo do Investimento (dias)</label>
+                        <input type="number" id="prazo-dias" min="1" step="1" value="365" class="w-full py-2 input-line" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-medium mb-2">Selecione as opções para comparar:</label>
+                    <div id="caixinhas-list" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+                </div>
+
+                <div id="custom-caixinha-wrapper" class="hidden">
+                    <div class="pt-4 mt-6 border-t-2 border-dashed border-gray-200">
+                        <h3 class="text-xl font-bold mb-4 text-[#4E8D7C]">Detalhes da Caixinha Personalizada</h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block font-medium mb-1" for="custom-name">Nome da Caixinha</label>
+                                    <input type="text" id="custom-name" value="Personalizada" class="w-full py-2 input-line" required>
+                                </div>
+                                <div>
+                                    <label class="block font-medium mb-1" for="custom-rentability">Rentabilidade (% do CDI)</label>
+                                    <input type="number" id="custom-rentability" min="1" step="1" value="110" class="w-full py-2 input-line" required>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block font-medium mb-1">Imposto de Renda (IR)</label>
+                                    <div class="flex items-center gap-4">
+                                        <label><input type="radio" name="ir_type" value="regressivo" checked> Regressivo</label>
+                                        <label><input type="radio" name="ir_type" value="fixo"> Fixo</label>
+                                    </div>
+                                </div>
+                                <div id="custom-ir-fixed-value-container" class="hidden">
+                                    <label class="block font-medium mb-1" for="custom-ir-fixed-value">Alíquota Fixa de IR (%)</label>
+                                    <input type="number" id="custom-ir-fixed-value" min="0" step="0.1" value="15" class="w-full py-2 input-line">
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-6 pt-2">
+                                <div class="flex items-center gap-3">
+                                    <label for="custom-iof" class="font-medium text-gray-700">É isento de IOF?</label>
+                                    <label class="switch"><input type="checkbox" id="custom-iof"><span class="slider"></span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button type="submit" class="bg-[#4E8D7C] text-white font-semibold px-8 py-3 rounded-full shadow-md hover:bg-[#3B6B5E] transition-all duration-200 transform hover:scale-105">
+                        Calcular Comparativo
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section id="result-section" class="mt-10 hidden">
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-center text-[#4E8D7C]">Comparativo de Rentabilidade Líquida</h2>
+            <div id="result-table-container" class="overflow-x-auto bg-white rounded-2xl shadow-lg border border-gray-100"></div>
+        </section>
+    </main>
+
+    <script src="../js/calculadora.js"></script>
+</body>
+</html>
