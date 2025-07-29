@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p class="text-sm text-gray-500">${bank.toolName}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-2xl font-bold text-[#4E8D7C]">${rentabilityText} <span class="text-base font-medium text-gray-500">${bank.rentabilityDisplay ? '' : 'CDI'}</span></p>
+                        <p class="text-2xl font-bold text-[#4E8D7C]">${rentabilityText} <span class="text-base font-medium text-gray-500">CDI</span></p>
                     </div>
                 </div>
                 <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-4 gap-2 text-center">

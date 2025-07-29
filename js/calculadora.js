@@ -39,7 +39,7 @@ function calcIOF(dias, rendimentoBruto) {
 }
 
 function calcIR(dias, baseCalculo, bank) {
-    if (bank.ir_type === 'isento' || bank.ir === 'Isento.' || bank.rentabilityDisplay === 'Isento de IR') return 0;
+    if (bank.ir_type === 'isento' || bank.ir === 'Isento.' ) return 0;
 
     if (bank.ir_type === 'fixo') {
         const aliquotaFixa = (bank.ir_fixed_value || 0) / 100;
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="checkbox" value="${bank.id}" class="caixinha-checkbox h-4 w-4 rounded border-gray-300 text-[#4E8D7C] focus:ring-[#4E8D7C]">
             <div>
                 <span class="font-semibold text-sm">${bank.name}</span>
-                <span class="text-xs text-gray-500 block">${bank.rentabilityDisplay ? bank.rentabilityDisplay : bank.rentability + '% CDI'}</span>
+                <span class="text-xs text-gray-500 block">${bank.consideredRentabilityDisplay ? bank.consideredRentabilityDisplay : bank.rentability + '% CDI'}</span>
             </div>
         `;
         caixinhasList.appendChild(label);
