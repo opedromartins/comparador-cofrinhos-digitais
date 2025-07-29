@@ -248,6 +248,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 const rentabilidadeAnualBruta = CDI_ano * rentabilidadePercentual;
                 res = calculateComeCotasInvestment(valor, dias, rentabilidadeAnualBruta);
                 res.name = bank.name;
+
+            } else if (bank.ir === 'diario') {
+                let saldoAtual = valor;
+                let rendimentoBrutoAcumulado = 0;
+                let irAcumulado = 0;
+                const taxaRendimentoDiaria = CDI_dia * rentabilidadePercentual;
+
+                for (let i = 0; i < diasUteis; i++) {
+                    const rendimentoDoDia = saldoAtual * taxaRendimentoDiaria;
+                    const irDoDia = rendimentoDoDia * 0.225;
+                    
+                    saldoAtual += (rendimentoDoDia - irDoDia);
+                    
+                    rendimentoBrutoAcumulado += rendimentoDoDia;
+                    irAcumulado += irDoDia;
+                }
+                
+                const iof = bank.iof ? calcIOF(dias, rendimentoBrutoAcumulado) : 0;
+                const rendimentoLiquidoFinal = rendimentoBrutoAcumulado - irAcumulado - iof;
+
+                res = {
+                    name: bank.name,
+                    bruto: rendimentoBrutoAcumulado,
+                    iof: iof,
+                    ir: irAcumulado,
+                    liquida: rendimentoLiquidoFinal,
+                    saldoFinal: saldoAtual
+                };
+
             } else {
                 const fatorRendimentoDiario = 1 + (CDI_dia * rentabilidadePercentual);
                 const bruto = valor * (Math.pow(fatorRendimentoDiario, diasUteis) - 1);
