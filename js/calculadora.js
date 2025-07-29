@@ -191,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ir: 'Personalizado',
                 prazoMaximo: 0,
                 prazoMinimo: 0,
+                maxDepositValue: Number.POSITIVE_INFINITY
             };
             activeBankData.push(customBank);
         }
@@ -236,6 +237,10 @@ document.addEventListener('DOMContentLoaded', () => {
             res.prazoMinimoExcedido = prazoMinimo > 0 && dias < prazoMinimo;
             res.prazoMinimo = prazoMinimo;
 
+            const maxDepositValue = bank.maxDepositValue || 0;
+            res.valorMaximoExcedido = maxDepositValue > 0 && valor > maxDepositValue;
+            res.maxDepositValue = maxDepositValue;
+
             results.push(res);
         });
 
@@ -262,14 +267,24 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         
         results.forEach((res, index) => {
-            let warningHtml = '';
+            const warnings = [];
             if (res.prazoMaximoExcedido) {
-                warningHtml = `<span class="warning-tooltip ml-2">⚠️<span class="tooltip-text">O prazo de ${dias} dias excede o máximo de ${res.prazoMaximo} dias.</span></span>`;
+                warnings.push(`O prazo de ${dias} dias excede o máximo de ${res.prazoMaximo} dias.`);
             }
             if (res.prazoMinimoExcedido) {
-                warningHtml = `<span class="warning-tooltip ml-2">⚠️<span class="tooltip-text">O prazo de ${dias} dias é inferior ao mínimo de ${res.prazoMinimo} dias.</span></span>`;
+                warnings.push(`O prazo de ${dias} dias é inferior ao mínimo de ${res.prazoMinimo} dias.`);
+            }
+            if (res.valorMaximoExcedido) {
+                const formattedMax = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(res.maxDepositValue);
+                warnings.push(`O valor do aporte excede o limite de ${formattedMax}.`);
             }
             
+            let warningHtml = '';
+            if (warnings.length > 0) {
+                const tooltipText = warnings.join(' ');
+                warningHtml = `<span class="warning-tooltip ml-2">⚠️<span class="tooltip-text">${tooltipText}</span></span>`;
+            }
+
             html += `
                 <tr class="${index === 0 ? 'bg-green-50' : ''}">
                     <td class="font-bold text-center">${index + 1}º</td>
