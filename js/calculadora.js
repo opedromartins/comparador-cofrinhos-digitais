@@ -27,6 +27,10 @@ function calcIR(dias, baseCalculo, bank) {
         return baseCalculo * aliquotaFixa;
     }
 
+    if (bank.ir === 'diario') {
+        return baseCalculo * 0.225;
+    }
+
     if (bank.ir.includes('Come-cotas')) return baseCalculo * 0.15;
     
     let aliquotaIR;
