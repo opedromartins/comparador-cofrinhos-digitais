@@ -21,7 +21,7 @@ function calcIOF(dias, rendimentoBruto) {
 
 function calcIR(dias, baseCalculo, bank) {
     if (bank.ir_type === 'isento' || bank.ir === 'Isento.' || bank.rentabilityDisplay === 'Isento de IR') return 0;
-    
+
     if (bank.ir_type === 'fixo') {
         const aliquotaFixa = (bank.ir_fixed_value || 0) / 100;
         return baseCalculo * aliquotaFixa;
@@ -31,8 +31,6 @@ function calcIR(dias, baseCalculo, bank) {
         return baseCalculo * 0.225;
     }
 
-    if (bank.ir.includes('Come-cotas')) return baseCalculo * 0.15;
-    
     let aliquotaIR;
     if (dias <= 180) aliquotaIR = 0.225;
     else if (dias <= 360) aliquotaIR = 0.20;
@@ -40,6 +38,61 @@ function calcIR(dias, baseCalculo, bank) {
     else aliquotaIR = 0.15;
     return baseCalculo * aliquotaIR;
 }
+
+function calculateComeCotasInvestment(valorInicial, dias, rentabilidadeAnual) {
+    const today = new Date();
+    let saldo = valorInicial;
+    let totalRendimentoBruto = 0;
+    let totalIR = 0;
+    const taxaDiaria = Math.pow(1 + (rentabilidadeAnual / 100), 1 / 252) - 1;
+
+    let ultimoSaldoAposComeCotas = valorInicial;
+
+    for (let i = 1; i <= dias; i++) {
+        const currentDate = new Date(today.getTime());
+        currentDate.setDate(today.getDate() + i);
+        const dayOfWeek = currentDate.getDay();
+        const dia = currentDate.getDate();
+        const mes = currentDate.getMonth() + 1; // getMonth() é 0-indexed
+
+        let rendimentoDoDia = 0;
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Se for um dia útil
+            rendimentoDoDia = saldo * taxaDiaria;
+            saldo += rendimentoDoDia;
+            totalRendimentoBruto += rendimentoDoDia;
+        }
+
+        // Verifica se é o último dia do mês de Maio ou Novembro
+        const isUltimoDiaMes = (new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)).getDate() === dia;
+        
+        if (isUltimoDiaMes && (mes === 5 || mes === 11)) {
+            const rendimentoDesdeUltimoComeCotas = saldo - ultimoSaldoAposComeCotas;
+            if (rendimentoDesdeUltimoComeCotas > 0) {
+                const irDoSemestre = rendimentoDesdeUltimoComeCotas * 0.15; // Alíquota de 15% para fundos de longo prazo
+                totalIR += irDoSemestre;
+                saldo -= irDoSemestre;
+                ultimoSaldoAposComeCotas = saldo;
+            }
+        }
+    }
+    
+    const rendimentoBrutoFinal = totalRendimentoBruto;
+    const rendimentoLiquido = rendimentoBrutoFinal - totalIR;
+    const saldoFinal = valorInicial + rendimentoLiquido;
+
+    // Para o come-cotas, o IOF é calculado sobre o rendimento bruto no momento do resgate.
+    const iof = calcIOF(dias, rendimentoBrutoFinal);
+    const rendimentoLiquidoFinal = rendimentoBrutoFinal - totalIR - iof;
+    
+    return {
+        bruto: rendimentoBrutoFinal,
+        iof: iof,
+        ir: totalIR,
+        liquida: rendimentoLiquidoFinal,
+        saldoFinal: valorInicial + rendimentoLiquidoFinal
+    };
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const caixinhasList = document.getElementById('caixinhas-list');
@@ -132,28 +185,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const bank = activeBankData.find(b => b.id === id);
             if (!bank) return;
 
+            let res;
             const rentabilidadePercentual = bank.rentability / 100;
-            let bruto = 0, iof = 0, ir = 0, liquida = 0, saldoFinal = 0;
 
-            const fatorRendimentoDiario = 1 + (CDI_dia * rentabilidadePercentual);
-            bruto = valor * (Math.pow(fatorRendimentoDiario, diasUteis) - 1);
+            if (bank.ir.includes('Come-cotas')) {
+                const rentabilidadeAnualBruta = CDI_ano * rentabilidadePercentual;
+                res = calculateComeCotasInvestment(valor, dias, rentabilidadeAnualBruta);
+                res.name = bank.name;
+            } else {
+                const fatorRendimentoDiario = 1 + (CDI_dia * rentabilidadePercentual);
+                const bruto = valor * (Math.pow(fatorRendimentoDiario, diasUteis) - 1);
+                
+                let iof = 0;
+                if (bank.iof) {
+                    iof = calcIOF(dias, bruto);
+                }
+                
+                const rendimentoPosIOF = bruto - iof;
+                const ir = calcIR(dias, rendimentoPosIOF, bank);
+                const liquida = rendimentoPosIOF - ir;
+                const saldoFinal = valor + liquida;
 
-            if (bank.iof) {
-                iof = calcIOF(dias, bruto);
+                res = { name: bank.name, bruto, iof, ir, liquida, saldoFinal };
             }
-            const rendimentoPosIOF = bruto - iof;
-            ir = calcIR(dias, rendimentoPosIOF, bank);
-            liquida = rendimentoPosIOF - ir;
-            saldoFinal = valor + liquida;
             
             const prazoMaximo = bank.prazoMaximo || 0;
-            const prazoMaximoExcedido = prazoMaximo > 0 && dias > prazoMaximo;
+            res.prazoMaximoExcedido = prazoMaximo > 0 && dias > prazoMaximo;
+            res.prazoMaximo = prazoMaximo;
+            
             const prazoMinimo = bank.prazoMinimo || 0;
-            const prazoMinimoExcedido = prazoMinimo > 0 && dias < prazoMinimo;
+            res.prazoMinimoExcedido = prazoMinimo > 0 && dias < prazoMinimo;
+            res.prazoMinimo = prazoMinimo;
 
-            results.push({
-                name: bank.name, bruto, iof, ir, liquida, saldoFinal, prazoMaximoExcedido, prazoMaximo, prazoMinimoExcedido, prazoMinimo
-            });
+            results.push(res);
         });
 
         results.sort((a, b) => b.saldoFinal - a.saldoFinal);
